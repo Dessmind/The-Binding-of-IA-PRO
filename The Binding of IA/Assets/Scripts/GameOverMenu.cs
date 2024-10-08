@@ -5,11 +5,13 @@ public class GameOverMenu : MonoBehaviour
 {
     public GameObject gameOverCanvas; // Referencia al Canvas de Game Over
     public GameObject hud; // Referencia al HUD
+    private PlayerUI playerUI; // Referencia al script PlayerUI
 
     private void Start()
     {
         hud.SetActive(true); // Asegúrate de que el HUD esté activo al inicio
         gameOverCanvas.SetActive(false); // Asegúrate de que el Canvas de Game Over esté oculto al inicio
+        playerUI = FindObjectOfType<PlayerUI>(); // Encuentra el PlayerUI en la escena
     }
 
     public void ShowGameOverScreen()
@@ -23,6 +25,7 @@ public class GameOverMenu : MonoBehaviour
     {
         Time.timeScale = 1; // Restaura el tiempo del juego
         hud.SetActive(true); // Muestra el HUD
+        playerUI.ResetScore(); // Reinicia el puntaje
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // Reinicia la escena actual
     }
 

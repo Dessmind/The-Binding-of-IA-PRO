@@ -3,87 +3,111 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] protected int health = 100; // Vida del enemigo como entero
-    [SerializeField] protected int damage = 1; // Daño que causa al jugador
-    [SerializeField] protected Color damageColor = Color.red; // Color para el efecto de daño
+    [SerializeField] protected int health = 100;
+    [SerializeField] protected int damage = 1;
+    [SerializeField] protected Color damageColor = Color.red;
 
-    private bool isAlive = true; // Estado del enemigo
-    private SpriteRenderer spriteRenderer; // Referencia al SpriteRenderer
+    protected bool isAlive = true; // Cambiado a protected para que sea accesible en TankEnemy
+    private SpriteRenderer spriteRenderer;
 
-    private Coroutine damageEffectCoroutine; // Coroutine para el efecto de daño
+    private Coroutine damageEffectCoroutine;
+
+    // Para las partículas
+    [SerializeField] private GameObject explosionParticlesPrefab; // Asignar en el Inspector
+
+    // Nueva variable para la cantidad de puntos
+    [SerializeField] private int pointsValue = 100; // Asignar en el Inspector
 
     private void Start()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>(); // Obtener el componente SpriteRenderer
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer == null)
+        {
+            Debug.LogError("SpriteRenderer not found on Enemy object.");
+        }
     }
 
-    // Método para aplicar daño al enemigo
     public virtual void TakeDamage(int amount)
     {
         if (!isAlive) return;
 
-        health -= amount; // Reducir la vida
+        health -= amount;
 
-        // Comenzar el efecto de daño
         if (damageEffectCoroutine != null)
-            StopCoroutine(damageEffectCoroutine); // Detener cualquier parpadeo anterior
-        damageEffectCoroutine = StartCoroutine(ShowDamageEffect()); // Mostrar efecto de daño
+            StopCoroutine(damageEffectCoroutine);
+        damageEffectCoroutine = StartCoroutine(ShowDamageEffect());
 
-        // Comprobar si ha muerto
         if (health <= 0)
         {
-            Die(); // Llamar al método de morir
+            Die();
         }
     }
 
-    // Método que se llama al morir
     protected virtual void Die()
     {
-        isAlive = false; // Cambiar el estado a no vivo
+        isAlive = false;
         if (damageEffectCoroutine != null)
-            StopCoroutine(damageEffectCoroutine); // Detener el parpadeo de daño si está activo
-        StartCoroutine(DieEffect()); // Iniciar el efecto de muerte
+            StopCoroutine(damageEffectCoroutine);
+
+        // Llama a la función para sumar puntos
+        PlayerUI playerUI = FindObjectOfType<PlayerUI>();
+        if (playerUI != null)
+        {
+            playerUI.AddScore(pointsValue); // Sumar puntos al jugador
+        }
+
+        StartCoroutine(DieEffect());
     }
 
-    // Efecto de muerte, parpadea antes de destruir
     private IEnumerator DieEffect()
     {
-        float blinkDuration = 0.5f; // Duración total del parpadeo
-        int blinkCount = 5; // Cantidad de parpadeos
+        // Aquí puedes inicializar las partículas justo antes de destruir el objeto
+        if (explosionParticlesPrefab != null)
+        {
+            // Instanciamos las partículas en la posición del enemigo
+            GameObject explosion = Instantiate(explosionParticlesPrefab, transform.position, Quaternion.identity);
+            Destroy(explosion, 2f); // Destruir las partículas después de 2 segundos
+        }
+        else
+        {
+            Debug.LogError("Explosion particles prefab is not assigned in the Inspector.");
+        }
+
+        float blinkDuration = 0.5f;
+        int blinkCount = 5;
 
         for (int i = 0; i < blinkCount; i++)
         {
-            spriteRenderer.enabled = false; // Desactiva el sprite
-            yield return new WaitForSeconds(blinkDuration / (blinkCount * 2)); // Espera medio tiempo de parpadeo
-            spriteRenderer.enabled = true; // Activa el sprite
-            yield return new WaitForSeconds(blinkDuration / (blinkCount * 2)); // Espera medio tiempo de parpadeo
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.enabled = false;
+                yield return new WaitForSeconds(blinkDuration / (blinkCount * 2));
+                spriteRenderer.enabled = true;
+                yield return new WaitForSeconds(blinkDuration / (blinkCount * 2));
+            }
         }
 
-        Destroy(gameObject); // Destruir el objeto
+        Destroy(gameObject);
     }
 
-    // Método para mostrar el efecto de daño
     private IEnumerator ShowDamageEffect()
     {
         if (spriteRenderer != null)
         {
-            // Cambiar el color del enemigo a rojo
             spriteRenderer.color = damageColor;
-            yield return new WaitForSeconds(0.2f); // Esperar un poco
-            spriteRenderer.color = Color.white; // Regresar al color original
+            yield return new WaitForSeconds(0.2f);
+            spriteRenderer.color = Color.white;
         }
     }
 
-    // Método para manejar la colisión con el jugador
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player") && isAlive) // Comprobar si colisiona con el jugador y está vivo
+        if (collision.CompareTag("Player") && isAlive)
         {
-            // Aplicar daño al jugador (necesitarás tener referencia al script del jugador)
             PlayerHealth playerHealth = collision.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(damage); // Aplicar daño al jugador
+                playerHealth.TakeDamage(damage);
             }
         }
     }

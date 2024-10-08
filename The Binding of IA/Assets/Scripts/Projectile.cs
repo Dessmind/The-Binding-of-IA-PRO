@@ -2,20 +2,19 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    [SerializeField] private int damage = 10; // Daño del proyectil
-    [SerializeField] private float lifespan = 2f; // Tiempo de vida del proyectil
-    [SerializeField] private GameObject destructionEffectPrefab; // Prefab de la partícula de destrucción
+    [SerializeField] private int damage = 10;
+    [SerializeField] private float lifespan = 2f;
+    [SerializeField] private GameObject destructionEffectPrefab;
 
     private void Start()
     {
-        Destroy(gameObject, lifespan); // Destruir el proyectil después de un tiempo
+        Destroy(gameObject, lifespan);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("EnemyBullets"))
         {
-            // Destruir ambos proyectiles y crear el efecto de destrucción
             Instantiate(destructionEffectPrefab, transform.position, Quaternion.identity);
             Destroy(collision.gameObject);
             Destroy(gameObject);
@@ -25,25 +24,30 @@ public class Projectile : MonoBehaviour
             Enemy enemy = collision.GetComponent<Enemy>();
             if (enemy != null)
             {
-                enemy.TakeDamage(damage); // Aplicar daño al enemigo
+                enemy.TakeDamage(damage);
             }
             Instantiate(destructionEffectPrefab, transform.position, Quaternion.identity);
-            Destroy(gameObject); // Destruir el proyectil tras colisionar
+            Destroy(gameObject);
         }
         else if (collision.CompareTag("Destructible"))
         {
             Destructible destructible = collision.GetComponent<Destructible>();
             if (destructible != null)
             {
-                destructible.TakeDamage(damage); // Aplicar daño al objeto destructible
+                destructible.TakeDamage(damage);
             }
             Instantiate(destructionEffectPrefab, transform.position, Quaternion.identity);
-            Destroy(gameObject); // Destruir el proyectil tras colisionar
+            Destroy(gameObject);
         }
-        else if (collision.CompareTag("Walls")) // Nueva condición para el tag "Walls"
+        else if (collision.CompareTag("Walls"))
         {
-            Instantiate(destructionEffectPrefab, transform.position, Quaternion.identity); // Crear efecto de destrucción
-            Destroy(gameObject); // Destruye este proyectil
+            Instantiate(destructionEffectPrefab, transform.position, Quaternion.identity);
+            Destroy(gameObject);
+        }
+        else if (collision.CompareTag("Obstacles")) // Nueva condición para "Obstacles"
+        {
+            Instantiate(destructionEffectPrefab, transform.position, Quaternion.identity);
+            Destroy(gameObject);
         }
     }
 }

@@ -142,8 +142,8 @@ Transform:
   m_GameObject: {fileID: 1614709745050414849}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.43, z: 0}
-  m_LocalScale: {x: 17, y: 17, z: 17}
+  m_LocalPosition: {x: 0, y: -0.33, z: 0}
+  m_LocalScale: {x: 13, y: 13, z: 13}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5872634723307370692}
@@ -252,7 +252,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 5.61, y: 2.42, z: -0.07627383}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 1}
+  m_LocalScale: {x: 1.35, y: 1.35, z: 1.2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6261082446859276626}
@@ -348,6 +348,8 @@ MonoBehaviour:
   health: 50
   damage: 1
   damageColor: {r: 1, g: 0, b: 0, a: 1}
+  explosionParticlesPrefab: {fileID: 9115635717963567737, guid: 1ff71de704960924a8d5c5323ddffc30, type: 3}
+  pointsValue: 350
 --- !u!114 &4677613914865451051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -403,16 +405,16 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.07277727, y: -0.63117933}
+  m_Offset: {x: -0.07277715, y: -0.5873191}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.4545455, y: 2.909091}
+    oldSize: {x: 1.2307693, y: 2.4615386}
     newSize: {x: 1.4545455, y: 2.909091}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.0350065, y: 1.7152286}
+  m_Size: {x: 0.7718452, y: 1.8029491}
   m_EdgeRadius: 0

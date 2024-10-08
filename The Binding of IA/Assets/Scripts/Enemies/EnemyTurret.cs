@@ -7,7 +7,7 @@ public class ShootAI : MonoBehaviour
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private float timeBetweenShoots = 1f;
     private bool playerDetected = false;
-    private Coroutine shootingCoroutine;
+    private Coroutine shootingCoroutine = null;
     private Coroutine cooldownCoroutine;
 
     [Header("Field of View Settings")]
@@ -22,12 +22,19 @@ public class ShootAI : MonoBehaviour
 
     void Start()
     {
-        player = FindObjectOfType<PlayerMovement>().transform;
+        PlayerMovement playerMovement = FindObjectOfType<PlayerMovement>(); // Busca al jugador en la escena
+        if (playerMovement != null)
+        {
+            player = playerMovement.transform;
+        }
     }
 
     void Update()
     {
-        CheckPlayerInFieldOfView();
+        if (player != null) // Verifica si el jugador existe antes de verificar el campo de visión
+        {
+            CheckPlayerInFieldOfView();
+        }
     }
 
     private void CheckPlayerInFieldOfView()
@@ -85,8 +92,11 @@ public class ShootAI : MonoBehaviour
         // Si después del cooldown el jugador sigue fuera del campo de visión
         if (!playerDetected)
         {
-            StopCoroutine(shootingCoroutine);
-            shootingCoroutine = null;
+            if (shootingCoroutine != null)
+            {
+                StopCoroutine(shootingCoroutine);
+                shootingCoroutine = null;
+            }
         }
         playerDetected = false;
     }
@@ -95,7 +105,7 @@ public class ShootAI : MonoBehaviour
     {
         while (true) // Mantener el Coroutine activo indefinidamente
         {
-            if (playerDetected)
+            if (playerDetected && player != null) // Verifica si el jugador existe y está detectado
             {
                 Instantiate(projectilePrefab, transform.position, Quaternion.identity);
                 yield return new WaitForSeconds(timeBetweenShoots);

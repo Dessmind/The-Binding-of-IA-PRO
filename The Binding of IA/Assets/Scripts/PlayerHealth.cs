@@ -3,78 +3,91 @@ using System.Collections;
 
 public class PlayerHealth : MonoBehaviour
 {
-    [SerializeField] private int maxHealth = 3; // Salud máxima como entero
-    private int currentHealth; // Salud actual como entero
-    private bool isInvulnerable = false; // Indica si el jugador es invulnerable
+    [SerializeField] private int maxHealth = 3; // Salud máxima
+    private int currentHealth; // Salud actual
+    private bool isInvulnerable = false; // Invulnerabilidad
     private SpriteRenderer spriteRenderer; // Referencia al SpriteRenderer
-    private PlayerUI playerUI; // Referencia a la UI del jugador
-    private PlayerMovement playerMovement; // Referencia al script de movimiento
-    [SerializeField] private GameObject gameOverCanvas; // Referencia al Canvas de Game Over
+    private PlayerUI playerUI; // UI del jugador
+    private PlayerMovement playerMovement; // Script de movimiento
+    [SerializeField] private GameObject gameOverCanvas; // Canvas de Game Over
+    [SerializeField] private GameObject deathParticlesPrefab; // Prefab de partículas de muerte
 
     void Start()
     {
-        currentHealth = maxHealth; // Inicializa la salud actual
-        spriteRenderer = GetComponent<SpriteRenderer>(); // Obtiene el SpriteRenderer
-        playerUI = FindObjectOfType<PlayerUI>(); // Busca la UI del jugador
-        playerMovement = GetComponent<PlayerMovement>(); // Obtiene el script de movimiento
-        playerUI.UpdateHearts(); // Actualiza las vidas en la interfaz al inicio
+        currentHealth = maxHealth;
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        playerUI = FindObjectOfType<PlayerUI>();
+        playerMovement = GetComponent<PlayerMovement>();
+        playerUI.UpdateHearts();
     }
 
     public void TakeDamage(int damage)
     {
-        if (isInvulnerable) return; // Si es invulnerable, no recibe daño
+        if (isInvulnerable) return;
 
-        currentHealth -= damage; // Reduce la salud actual
-        playerUI.UpdateHearts(); // Actualiza la interfaz
-        StartCoroutine(Invulnerability()); // Activa la invulnerabilidad
+        currentHealth -= damage;
+        playerUI.UpdateHearts();
+        StartCoroutine(Invulnerability());
 
         if (currentHealth <= 0)
         {
-            Die(); // Llama al método de muerte si la salud es cero o menos
+            Die();
         }
     }
 
     private void Die()
     {
         Debug.Log("Player ha muerto.");
-        if (playerMovement != null) // Verificar que playerMovement no sea null
+        if (playerMovement != null)
         {
-            playerMovement.SetAlive(false); // Detiene el movimiento del jugador
+            playerMovement.SetAlive(false);
         }
 
-        // Mostrar pantalla de Game Over utilizando la referencia del Canvas
-        if (gameOverCanvas != null) // Verifica que gameOverCanvas no sea null
+        // Mostrar pantalla de Game Over
+        if (gameOverCanvas != null)
         {
-            gameOverCanvas.SetActive(true); // Activa el Canvas de Game Over
+            gameOverCanvas.SetActive(true);
         }
 
-        StartCoroutine(BlinkAndDisappear()); // Llama al parpadeo y desaparición
+        StartCoroutine(BlinkAndDisappear());
     }
 
     private IEnumerator BlinkAndDisappear()
     {
-        for (int i = 0; i < 5; i++) // Parpadeo de 5 veces
+        for (int i = 0; i < 5; i++)
         {
-            spriteRenderer.enabled = !spriteRenderer.enabled; // Alterna la visibilidad
+            spriteRenderer.enabled = !spriteRenderer.enabled;
             yield return new WaitForSeconds(0.2f);
         }
-        gameObject.SetActive(false); // Desactiva el objeto y sus hijos
+
+        // Instanciar partículas de muerte después de que el objeto se ha desactivado
+        if (deathParticlesPrefab != null)
+        {
+            Instantiate(deathParticlesPrefab, transform.position, Quaternion.identity);
+        }
+
+        gameObject.SetActive(false);
     }
 
     private IEnumerator Invulnerability()
     {
-        isInvulnerable = true; // Activa la invulnerabilidad
-        for (int i = 0; i < 5; i++) // Parpadeo de 5 veces
+        isInvulnerable = true;
+        for (int i = 0; i < 5; i++)
         {
-            spriteRenderer.enabled = !spriteRenderer.enabled; // Alterna la visibilidad
+            spriteRenderer.enabled = !spriteRenderer.enabled;
             yield return new WaitForSeconds(0.2f);
         }
-        spriteRenderer.enabled = true; // Asegúrate de que el sprite esté visible
-        isInvulnerable = false; // Desactiva la invulnerabilidad
+        spriteRenderer.enabled = true;
+        isInvulnerable = false;
     }
 
     public int GetCurrentHealth()
     {
-        return currentHealth; // Devuelve la salud actual
+        return currentHealth;
+    }
+
+    public bool IsAlive()
+    {
+        return currentHealth > 0;
     }
 }

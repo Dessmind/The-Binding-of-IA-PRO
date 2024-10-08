@@ -9,6 +9,7 @@ TagManager:
   - Bullets
   - EnemyBullets
   - Walls
+  - Obstacles
   layers:
   - Default
   - TransparentFX
@@ -23,7 +24,7 @@ TagManager:
   - Bullets
   - EnemyBullets
   - Walls
-  - 
+  - Obstacles
   - 
   - 
   - 
